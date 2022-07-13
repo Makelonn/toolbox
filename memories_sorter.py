@@ -52,17 +52,22 @@ def image_plotting(img1, img2):
     plt.axis('off')
     plt.show()
 
+def read_img(img_name, srcfolder):
+    p = Path(srcfolder, img_name)
+    return mpimg.imread(p)
+
+def list_files(folder):
+    return list(folder.glob("**/*.*"))
+
 def memories_sorter(src, dest):
+    file_list = list_files(src)
+    for mem in file_list:
+        name = mem.parts[-1]
+        print(image_name_parser(name))
     pass
 
-a = "NAME_20010217_16301254.jpg"
-print(image_name_parser(a))
-print(monthly_str(image_name_parser(a)["info_time"]["month"]))
 
 current_repository = Path('./unsorted')
 aim_repository = Path('./sorted')
 
-d1 = mpimg.imread(Path(current_repository, "1.jpg"))
-d2 = mpimg.imread(Path(current_repository,"3.jpeg"))
-
-image_plotting(d1,d2)
+memories_sorter(current_repository, aim_repository)
