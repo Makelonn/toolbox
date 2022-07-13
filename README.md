@@ -1,2 +1,2 @@
 # toolbox
-Some scripts &amp; program to use in everyday life
+Some scripts and programs to use in everyday life
