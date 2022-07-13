@@ -1,11 +1,8 @@
 """This files helps you to sort by year/month all images from a repository to another"""
 
-
-from email.mime import image
-
-
-current_repository = './unsorted'
-aim_repository = './sorted'
+from matplotlib import pyplot as plt
+import matplotlib.image as mpimg
+from pathlib import Path
 
 
 def image_name_parser(filename):
@@ -46,7 +43,26 @@ def monthly_str(month_number):
     }
     return translator[month_number]
 
+def image_plotting(img1, img2):
+    plt.subplot(1, 2, 1)
+    plt.axis('off')
+    plt.imshow(img1)
+    plt.subplot(1, 2, 2)
+    plt.imshow(img2)
+    plt.axis('off')
+    plt.show()
+
+def memories_sorter(src, dest):
+    pass
 
 a = "NAME_20010217_16301254.jpg"
 print(image_name_parser(a))
 print(monthly_str(image_name_parser(a)["info_time"]["month"]))
+
+current_repository = Path('./unsorted')
+aim_repository = Path('./sorted')
+
+d1 = mpimg.imread(Path(current_repository, "1.jpg"))
+d2 = mpimg.imread(Path(current_repository,"3.jpeg"))
+
+image_plotting(d1,d2)
