@@ -3,11 +3,13 @@
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
 from pathlib import Path
-
+import shutil
 
 def image_name_parser(filename):
     # Format : IMG_YYYYMMDD_HHMMSSSS.ext
     f_split = filename.split("_")
+    if len(f_split) < 3:
+        return None
     ext = f_split[-1].split(".")
     f_split = f_split[:-1] + ext
     info ={
@@ -24,6 +26,8 @@ def image_name_parser(filename):
             "ext": f_split[-1]
         }
     }
+    if info['info_else']['name'] != "IMG":
+        return None
     return info
 
 def monthly_str(month_number):
@@ -61,9 +65,33 @@ def list_files(folder):
 
 def memories_sorter(src, dest):
     file_list = list_files(src)
+    print(len(file_list))
     for mem in file_list:
         name = mem.parts[-1]
-        print(image_name_parser(name))
+        parsed_name = image_name_parser(name)
+        if parsed_name is None:
+            continue
+        year = parsed_name["info_time"]["year"]
+        # Check if the folder year exists in dest
+        if not Path(dest, year).exists():
+            Path(dest, year).mkdir()
+        # Check if the folder month exists in dest/year
+        month = monthly_str(parsed_name["info_time"]["month"])
+        if not Path(dest, year, month).exists():
+            Path(dest, year, month).mkdir()
+        # Create the name of the new file
+        time_info = parsed_name["info_time"]["hour"] + "h" + parsed_name["info_time"]["min"] + "m" + parsed_name["info_time"]["sec"] + "s"
+        new_name = parsed_name["info_else"]["name"] +"_" + parsed_name["info_time"]["day"] + "_" + time_info + "." + parsed_name["info_else"]["ext"]
+        # Check if the file already exists in dest/year/month
+        number = 1
+        while Path(dest, year, month, new_name).exists():
+                new_name = parsed_name["info_else"]["name"] + time_info + "_" + str(number) + "." + parsed_name["info_else"]["ext"]
+                number += 1
+                break
+        # Copy the file
+        shutil.copy2(mem, Path(dest, year, month, new_name))
+
+        
     pass
 
 
