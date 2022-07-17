@@ -7,7 +7,7 @@ import shutil
 from loading_bar import LoadingBar
 
 
-def image_phone_parser(filename):
+def format_phone_parser(filename):
     # Format : IMG_YYYYMMDD_HHMMSSSS.ext
     f_split = filename.split("_")
     if len(f_split) < 3:
@@ -25,11 +25,33 @@ def image_phone_parser(filename):
         },
         "info_else" : {
             "name":f_split[0],
+            "end" : "".join(f_split[3:-1]),
             "ext": f_split[-1]
-        }
+        },
+        "new_name": f_split[0]+"_"+f_split[1][6:8]+"_"+f_split[2][0:2]+"h"+f_split[2][2:4]+"m"+f_split[2][4:6]+"s"+"".join(["_" if len(f_split[3:-1])>0 else ""]+f_split[3:-1])
     }
-    if info['info_else']['name'] != "IMG":
+    # New name = IMG_DD_HHMMSSSS_END.ext
+    return info
+
+def format_wa_parser(filename):
+    # Format : IMG-YEARMMDD-WAXXXX.ext
+    f_split = filename.split("-")
+    if len(f_split) < 3:
         return None
+    ext = f_split[-1].split(".")
+    f_split = f_split[:-1] + ext
+    info ={
+        "info_time" : {
+            "year": f_split[1][0:4],
+            "month": f_split[1][4:6],
+            "day": f_split[1][6:8]
+        },
+        "info_else" : {
+            "name":f_split[0],
+            "ext": f_split[-1]
+        },
+        "new_name": f_split[0]+"_"+f_split[1][6:8]+ "".join(["_" if len(f_split[2:-1])>0 else ""]+f_split[2:-1])
+    }
     return info
 
 def monthly_str(month_number):
@@ -52,13 +74,13 @@ def monthly_str(month_number):
 def list_files(folder):
     return list(folder.glob("**/*.*"))
 
-def memories_sorter(src, dest, keep_old=False):
+def memories_sorter(src, dest, parser, keep_old=False):
     file_list = list_files(src)
     print(len(file_list))
     loader = LoadingBar(len(file_list))
     for mem in file_list:
         name = mem.parts[-1]
-        parsed_name = image_phone_parser(name)
+        parsed_name = parser(name)
         if parsed_name is None:
             continue
         year = parsed_name["info_time"]["year"]
@@ -69,13 +91,14 @@ def memories_sorter(src, dest, keep_old=False):
         month = monthly_str(parsed_name["info_time"]["month"])
         if not Path(dest, year, month).exists():
             Path(dest, year, month).mkdir()
+
         # Create the name of the new file
-        time_info = parsed_name["info_time"]["hour"] + "h" + parsed_name["info_time"]["min"] + "m" + parsed_name["info_time"]["sec"] + "s"
-        new_name = parsed_name["info_else"]["name"] +"_" + parsed_name["info_time"]["day"] + "_" + time_info + "." + parsed_name["info_else"]["ext"]
+        new_name = parsed_name["new_name"] +"." + parsed_name["info_else"]["ext"]
+
         # Check if the file already exists in dest/year/month
         number = 1
         while Path(dest, year, month, new_name).exists():
-                new_name = parsed_name["info_else"]["name"] + time_info + "_" + str(number) + "." + parsed_name["info_else"]["ext"]
+                new_name = parsed_name["new_name"] + "_" + str(number) + "." + parsed_name["info_else"]["ext"]
                 number += 1
         # Copy the file
         if keep_old :
@@ -85,7 +108,7 @@ def memories_sorter(src, dest, keep_old=False):
         loader.update()
     loader.finish()
 
-current_repository = Path('/Memories/tmp/jpg/classic_format')
-aim_repository = Path('/Memories/Photos')
+current_repository = Path('./src')
+aim_repository = Path('./dest')
 
-memories_sorter(current_repository, aim_repository)
+memories_sorter(current_repository, aim_repository, format_wa_parser, keep_old=False)
