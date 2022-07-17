@@ -4,8 +4,10 @@ from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
 from pathlib import Path
 import shutil
+from loading_bar import LoadingBar
 
-def image_name_parser(filename):
+
+def image_phone_parser(filename):
     # Format : IMG_YYYYMMDD_HHMMSSSS.ext
     f_split = filename.split("_")
     if len(f_split) < 3:
@@ -63,12 +65,13 @@ def read_img(img_name, srcfolder):
 def list_files(folder):
     return list(folder.glob("**/*.*"))
 
-def memories_sorter(src, dest):
+def memories_sorter(src, dest, keep_old=False):
     file_list = list_files(src)
     print(len(file_list))
+    loader = LoadingBar(len(file_list))
     for mem in file_list:
         name = mem.parts[-1]
-        parsed_name = image_name_parser(name)
+        parsed_name = image_phone_parser(name)
         if parsed_name is None:
             continue
         year = parsed_name["info_time"]["year"]
@@ -87,15 +90,15 @@ def memories_sorter(src, dest):
         while Path(dest, year, month, new_name).exists():
                 new_name = parsed_name["info_else"]["name"] + time_info + "_" + str(number) + "." + parsed_name["info_else"]["ext"]
                 number += 1
-                break
         # Copy the file
-        shutil.copy2(mem, Path(dest, year, month, new_name))
+        if keep_old :
+            shutil.copy2(mem, Path(dest, year, month, new_name))
+        else :
+            mem.rename(Path(dest, year, month, new_name))
+        loader.update()
+    loader.finish()
 
-        
-    pass
-
-
-current_repository = Path('./unsorted')
-aim_repository = Path('./sorted')
+current_repository = Path('/Memories/tmp/jpg/classic_format')
+aim_repository = Path('/Memories/Photos')
 
 memories_sorter(current_repository, aim_repository)
