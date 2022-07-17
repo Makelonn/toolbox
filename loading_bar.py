@@ -2,6 +2,7 @@ import sys
 
 class LoadingBar:
     def __init__(self, total):
+        assert(total > 0)
         self.total_files = total
         self.cpt = 0
         self.nb = 0
@@ -18,3 +19,6 @@ class LoadingBar:
     def update(self):
         self.cpt += 1
         self.print_bar()
+
+    def finish(self):
+        print("\nDone.")
