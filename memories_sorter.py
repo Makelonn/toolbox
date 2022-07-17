@@ -49,19 +49,6 @@ def monthly_str(month_number):
     }
     return translator[month_number]
 
-def image_plotting(img1, img2):
-    plt.subplot(1, 2, 1)
-    plt.axis('off')
-    plt.imshow(img1)
-    plt.subplot(1, 2, 2)
-    plt.imshow(img2)
-    plt.axis('off')
-    plt.show()
-
-def read_img(img_name, srcfolder):
-    p = Path(srcfolder, img_name)
-    return mpimg.imread(p)
-
 def list_files(folder):
     return list(folder.glob("**/*.*"))
 
