@@ -18,6 +18,3 @@ class LoadingBar:
     def update(self):
         self.cpt += 1
         self.print_bar()
-
-    def renew(self):
-        self.print_bar()
