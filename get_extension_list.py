@@ -1,12 +1,14 @@
 from pathlib import Path
 
-p = Path("./src")
 
-list_files = list(p.glob("**/*.*"))
+def get_extension_list(path_to_folder='.'):
+    path_to_folder = Path(path_to_folder)
 
-ext_list = set()
-for f in list_files :
-    ext_list.add(f.suffix)
+    list_files = list(path_to_folder.glob("**/*.*"))
 
-print("List of extension in the folder " + str(p) + ":")
-print(ext_list)
+    ext_list = set()
+    for f in list_files :
+        ext_list.add(f.suffix)
+
+    print("List of extension in the folder " + str(path_to_folder) + ":")
+    print(ext_list)
