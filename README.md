@@ -49,3 +49,20 @@ This simple script allows you to get a list of all extensions existing in the fo
 First, you need to edit the path variable to match the path you want to scan. Then use :
 
     python get_extension_list.py
+
+## Loading bar
+
+🔩 How does that work ?
+
+This is a simple loading bar that takes the total of stuff to load and calculate the percent the loading is at, and display a loading bar in the terminal.
+
+📚 Usage
+
+    from loading_bar import LoadingBar
+
+    total_to_study = 487
+    loader = LoadingBar(total_to_study)
+    for i in range(total_to_study):
+        # Do your stuff here
+        loader.update()
+    loader.finish()
